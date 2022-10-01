@@ -17,16 +17,18 @@ export class App extends Component {
     isLoading: false,
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.query !== this.state.query) {
+  componentDidUpdate(prevProps, { query, }) {
+    if (query !== this.state.query) {
       this.fetchPictures();
     }
   }
 
   toggleModal = () => {
-    this.setState((state) => ({
-      showModal: !state.showModal,
-    }));
+    this.setState(({ showModal }) => ({ showModal: !showModal, }));
+  };
+
+  toggleLoading = () => {
+    this.setState(({ isLoading }) => ({ isLoading: !isLoading }));
   };
 
   bigImage = (largeImage = "") => {
@@ -36,13 +38,8 @@ export class App extends Component {
 
   fetchPictures = () => {
     const { page, query } = this.state;
-    const options = {
-      page,
-      query,
-    };
-
-    this.setState({ isLoading: true });
-
+    const options = { page, query, };
+    this.toggleLoading()
     ApiService(options)
       .then((collections) => {
         this.setState((prevState) => ({
@@ -52,33 +49,30 @@ export class App extends Component {
       })
       .catch((error) => this.setState({ error: "Picture not found" }))
       .finally(() => {
-        this.setState({ isLoading: false });
+        this.toggleLoading()
       });
   };
-
-
 
   changQuery = (query) => {
     this.setState({ query: query, page: 1, collections: [], error: null });
   }
-
   render() {
-    const { collections, error, isLoading, showModal, largeImage, imgTags } = this.state;
+    const { collections, error, isLoading, showModal, largeImage, imgTags, page } = this.state;
+    const isNotLastPage = collections.length / (page - 1) === 12;
+    const btnEnable = collections.length > 0 && !isLoading && isNotLastPage;
     return (
       <div>
         <Searchbar onSubmit={this.changQuery} />
         {error && <h1>{error}</h1>}
         <ImageGallery collections={collections} bigImage={this.bigImage} />
         {isLoading && <Loader />}
-        {collections.length > 11 && !isLoading && (
-          <Button onClick={this.fetchPictures} />
+        {!isLoading && btnEnable && (<Button onClick={this.fetchPictures} />
         )}
         {showModal && (
           <Modal showModal={this.bigImage}>
             <img src={largeImage} alt={imgTags} />
           </Modal>
         )}
-
       </div>
     );
   }
