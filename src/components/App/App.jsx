@@ -4,7 +4,7 @@ import { ImageGallery } from '../ImageGallery/ImageGallery';
 import { Button } from "../Button/Button";
 import { Loader } from '../Loader/Loader'
 import { Modal } from "../Modal/Modal";
-import { ApiService } from '../Api/Api';
+import { ApiService } from '../../services/Api';
 export class App extends Component {
   state = {
     collections: [],
@@ -17,11 +17,11 @@ export class App extends Component {
     isLoading: false,
   };
 
-  componentDidUpdate(prevProps, { query, }) {
-    if (query !== this.state.query) {
+  componentDidUpdate(prevProps, { query, page }) {
+    if (query !== this.state.query || page !== this.state.page) {
       this.fetchPictures();
-    }
-  }
+    };
+  };
 
   toggleModal = () => {
     this.setState(({ showModal }) => ({ showModal: !showModal, }));
@@ -36,6 +36,14 @@ export class App extends Component {
     this.toggleModal();
   };
 
+  handleNextPage = () => {
+    this.setState(({ page }) => {
+      return {
+        page: page + 1,
+      };
+    });
+  };
+
   fetchPictures = () => {
     const { page, query } = this.state;
     const options = { page, query, };
@@ -44,7 +52,6 @@ export class App extends Component {
       .then((collections) => {
         this.setState((prevState) => ({
           collections: [...prevState.collections, ...collections],
-          page: prevState.page + 1,
         }));
       })
       .catch((error) => this.setState({ error: "Picture not found" }))
@@ -58,15 +65,24 @@ export class App extends Component {
   }
   render() {
     const { collections, error, isLoading, showModal, largeImage, imgTags, page } = this.state;
-    const isNotLastPage = collections.length / (page - 1) === 12;
+
+    console.log('collections', collections)
+    console.log('isLoading', isLoading)
+    console.log('showModal', showModal)
+    console.log('page', page)
+
+    const isNotLastPage = collections.length / page === 12;
     const btnEnable = collections.length > 0 && !isLoading && isNotLastPage;
+    console.log('isNotLastPage', isNotLastPage)
+    console.log('btnEnable', btnEnable)
+
     return (
       <div>
         <Searchbar onSubmit={this.changQuery} />
         {error && <h1>{error}</h1>}
         <ImageGallery collections={collections} bigImage={this.bigImage} />
         {isLoading && <Loader />}
-        {!isLoading && btnEnable && (<Button onClick={this.fetchPictures} />
+        {!isLoading && btnEnable && (<Button onClick={this.handleNextPage} />
         )}
         {showModal && (
           <Modal showModal={this.bigImage}>
@@ -75,5 +91,5 @@ export class App extends Component {
         )}
       </div>
     );
-  }
-}
+  };
+};
