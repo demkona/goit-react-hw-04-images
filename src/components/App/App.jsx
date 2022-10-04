@@ -21,6 +21,7 @@ export function App() {
       return;
     }
     fetchPictures();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, page]);
 
   const toggleModal = () => {
