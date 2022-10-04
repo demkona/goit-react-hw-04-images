@@ -1,24 +1,13 @@
-import PropTypes from 'prop-types';
 import css from '../ImageGalleryItem/ImageGalleryItem.module.css'
 
-
-
-export const ImageGalleryItem = ({ image, onClick }) => {
+export const ImageGalleryItem = ({ picturesId, srcWebformat, onClick }) => {
     return (
-        <li className={css.ImageGalleryItem}>
+        <li className={css.ImageGalleryItem} onClick={onClick}>
             <img
-                src={image}
+                src={srcWebformat}
                 alt=""
                 className={css.ImageGalleryItemImage}
-                onClick={onClick}
             />
         </li>
     );
-};
-
-ImageGalleryItem.propTypes = {
-    webformatURL: PropTypes.string,
-    largeImageURL: PropTypes.string,
-    tags: PropTypes.string,
-    bigImage: PropTypes.func,
 };

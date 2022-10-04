@@ -7,5 +7,5 @@ export const ApiService = ({ query = "", page = 1 }) => {
         .get(
             `https://pixabay.com/api/?q=${query}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&safesearch=true&per_page=12`
         )
-        .then(({ data }) => data.hits);
+        .then(response => response.data.hits);
 };
