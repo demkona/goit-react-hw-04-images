@@ -78,7 +78,6 @@ export function App() {
     </>
   )
 }
-
 // export class App extends Component {
 //   state = {
 //     collections: [],
