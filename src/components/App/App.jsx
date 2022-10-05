@@ -1,3 +1,4 @@
+
 import { Searchbar } from '../Searchbar/Searchbar';
 import { ImageGallery } from '../ImageGallery/ImageGallery';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
@@ -20,9 +21,21 @@ export function App() {
     if (!query || !page) {
       return;
     }
+
+    const fetchPictures = async () => {
+      try {
+        setIsLoading(true);
+        const images = await ApiService(query, page);
+        setCollections(collections => [...collections, ...images.hits]);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchPictures();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, page]);
+  }, [page, query]);
 
   const toggleModal = () => {
     setShowModal(prevState => !prevState);
@@ -37,17 +50,8 @@ export function App() {
     setPage(prevPage => prevPage + 1)
   };
 
-  const fetchPictures = () => {
-    const options = { page, query, };
-    setIsLoading(true);
-    ApiService(options)
-      .then(prevCollections => setCollections([...collections, ...prevCollections]),
-      )
-      .catch((error) => setError(error))
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
+
+
 
   const changQuery = query => {
     setQuery(query);
